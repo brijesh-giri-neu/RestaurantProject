@@ -17,7 +17,7 @@ App shell, dependencies, config, navigation.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-01 — Dependencies, config & Supabase client](./tasks/task-01-dependencies-and-supabase-client.md) | 🟨 Scaffolded | Done: `.env`, `src/config/env.ts` + `env.d.ts`, `react-native-dotenv` installed, babel plugin, `.gitignore`. **Remaining:** install supabase/nav/form deps, `pod install`, location permissions, `src/lib/supabase.ts`. |
+| [task-01 — Dependencies, config & Supabase client](./tasks/task-01-dependencies-and-supabase-client.md) | ✅ Done | Deps installed; env config + `dotenv.d.ts` (@env types fixed); `src/lib/supabase.ts` created; iOS/Android location permissions added. ⚠️ `pod install` still pending (CocoaPods not available in this env) — run before an iOS build. |
 | [task-07 — Navigation + app shell (auth-gated)](./tasks/task-07-navigation-app-shell.md) | ⬜ Not started | AuthStack vs AppStack; removes default RN screen. |
 
 ### Feature 2 — Authentication (login / signup)
@@ -25,23 +25,23 @@ Email/password auth, session persistence, per-user identity.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-05 — Auth: login/signup + context](./tasks/task-05-auth-login-signup.md) | ⬜ Not started | Supabase Auth; `useAuth()` context; Login/Signup screens. |
+| [task-05 — Auth: login/signup + context](./tasks/task-05-auth-login-signup.md) | ✅ Done | `AuthProvider`/`useAuth`, zod validation, Login/Signup screens (use `@hookform/resolvers`). Navigation wiring done in task-07. |
 
 ### Feature 3 — Cloud Data & Persistence
 Postgres schema, per-user security, typed data access.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-02 — Supabase schema, RLS & RPC](./tasks/task-02-supabase-schema-and-rls.md) | ⬜ Not started | Tables + RLS + `add_visit_with_items`. Supabase project created; URL+key in `.env`. |
-| [task-06 — Data access layer (Supabase)](./tasks/task-06-data-access-layer.md) | ⬜ Not started | Typed `src/data`; **pagination** (`Page<T>`, `.range()`). |
+| [task-02 — Supabase schema, RLS & RPC](./tasks/task-02-supabase-schema-and-rls.md) | ✅ Done (authored) | Migrations `0001`–`0003` + `supabase/README.md` created. ⚠️ Must be **applied to the live Supabase project** (`supabase db push` or SQL editor) before the app can read/write. |
+| [task-06 — Data access layer (Supabase)](./tasks/task-06-data-access-layer.md) | ✅ Done | Typed `src/data` with mappers, `addVisitWithItems` (RPC), paginated `listRestaurants`/`historyForRestaurant` (`Page<T>`). |
 
 ### Feature 4 — Location & Restaurant Autofill
 GPS capture + nearby-restaurant suggestions.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-03 — Location / GPS service](./tasks/task-03-location-service.md) | ⬜ Not started | Permission + `getCurrentLocation()`. |
-| [task-04 — OSM places autofill service](./tasks/task-04-places-osm-service.md) | ⬜ Not started | Free OSM behind swappable `PlacesService`. See F2 backlog (rate-limit hardening). |
+| [task-03 — Location / GPS service](./tasks/task-03-location-service.md) | ✅ Done | `requestLocationPermission` + `getCurrentLocation()` (typed errors). |
+| [task-04 — OSM places autofill service](./tasks/task-04-places-osm-service.md) | ✅ Done | `placesService` (Overpass + Nominatim) behind `PlacesService`; `geo.ts` haversine. See F2 backlog (rate-limit hardening). |
 
 ### Feature 5 — Log a Visit (form)
 The core data-entry flow.
