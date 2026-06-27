@@ -5,6 +5,7 @@ future work (nice-to-haves) not yet implemented. **Keep this file updated** when
 or scope changes.
 
 Last updated: 2026-06-27 · Stack: React Native + Supabase + OSM · Scope: mobile-only
+Status: **all v1 tasks (01–10) implemented** — pending live setup (apply migrations, fill `.env`, `pod install`) before running on device.
 
 Status legend: `⬜ Not started` · `🟨 Scaffolded/partial` · `🟦 In progress` · `✅ Done`
 
@@ -18,7 +19,7 @@ App shell, dependencies, config, navigation.
 | Task | Status | Notes |
 | ---- | ------ | ----- |
 | [task-01 — Dependencies, config & Supabase client](./tasks/task-01-dependencies-and-supabase-client.md) | ✅ Done | Deps installed; env config + `dotenv.d.ts` (@env types fixed); `src/lib/supabase.ts` created; iOS/Android location permissions added. ⚠️ `pod install` still pending (CocoaPods not available in this env) — run before an iOS build. |
-| [task-07 — Navigation + app shell (auth-gated)](./tasks/task-07-navigation-app-shell.md) | ⬜ Not started | AuthStack vs AppStack; removes default RN screen. |
+| [task-07 — Navigation + app shell (auth-gated)](./tasks/task-07-navigation-app-shell.md) | ✅ Done | App root + auth-gated RootNavigator (AuthStack/AppStack), ScreenContainer; entry registers src/app/App; default screen removed. |
 
 ### Feature 2 — Authentication (login / signup)
 Email/password auth, session persistence, per-user identity.
@@ -48,21 +49,21 @@ The core data-entry flow.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-08 — Add Visit form screen](./tasks/task-08-add-visit-form.md) | ⬜ Not started | GPS + name autofill, dynamic items, atomic save. |
+| [task-08 — Add Visit form screen](./tasks/task-08-add-visit-form.md) | ✅ Done | GPS + OSM autofill, dynamic items (useFieldArray + zod), atomic save, navigates to Lookup. |
 
 ### Feature 6 — Lookup Past Orders
 View a user's history per restaurant.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-09 — Lookup screen](./tasks/task-09-lookup-screen.md) | ⬜ Not started | **Virtualized FlatList + infinite-scroll pagination.** |
+| [task-09 — Lookup screen](./tasks/task-09-lookup-screen.md) | ✅ Done | Searchable restaurant list + per-restaurant history; virtualized FlatLists, infinite scroll, refresh on focus. |
 
 ### Feature 7 — Quality (tests & docs)
 Automated tests + documentation.
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| [task-10 — Tests & docs](./tasks/task-10-testing-docs.md) | ⬜ Not started | Unit tests for pure logic; README/docs update. |
+| [task-10 — Tests & docs](./tasks/task-10-testing-docs.md) | ✅ Done | 5 unit-test suites (mapping, visit/auth schemas, OSM parsing, geo) — 35 tests green; README updated for Supabase setup. |
 
 ---
 
@@ -70,8 +71,8 @@ Automated tests + documentation.
 
 | Requirement | Where | Status |
 | ----------- | ----- | ------ |
-| List **virtualization** (FlatList/SectionList, no ScrollView+map) | task-09 (+ future lists) | ⬜ Planned |
-| **Pagination** (data `Page<T>` + UI `onEndReached` load-more) | task-06 + task-09 | ⬜ Planned |
+| List **virtualization** (FlatList/SectionList, no ScrollView+map) | task-09 (+ future lists) | ✅ Done |
+| **Pagination** (data `Page<T>` + UI `onEndReached` load-more) | task-06 + task-09 | ✅ Done |
 
 ---
 
