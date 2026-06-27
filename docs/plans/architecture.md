@@ -25,7 +25,7 @@ src/
       types.ts               # route param types
   config/
     env.ts                   # validated access to .env vars (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, OSM...)
-    env.d.ts                 # type decls for the '@env' module (react-native-dotenv)
+    dotenv.d.ts              # type decls for the '@env' module (react-native-dotenv; name must differ from env.ts)
   lib/
     supabase.ts              # createClient singleton (AsyncStorage session, url-polyfill)
   data/                      # cloud data-access (replaces local repositories)
