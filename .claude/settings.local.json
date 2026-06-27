@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(npx @react-native-community/cli@latest init RestaurantProject --directory . --skip-install)",
+      "Bash(npx @react-native-community/cli@latest init RestaurantProject --directory /Users/brijesh/RestaurantProject --skip-install)",
+      "Read(//private/tmp/**)",
+      "Bash(rm -rf rn_tmp_init)",
+      "Bash(npx @react-native-community/cli@latest init RestaurantProject --directory /tmp/rn_tmp_init --skip-install)"
+    ]
+  }
+}
