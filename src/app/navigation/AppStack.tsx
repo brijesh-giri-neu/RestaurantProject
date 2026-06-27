@@ -1,0 +1,51 @@
+import React from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAuth } from '../../features/auth';
+import { AddVisitScreen } from '../../features/visits/screens/AddVisitScreen';
+import { LookupScreen } from '../../features/visits/screens/LookupScreen';
+import type { AppStackParamList } from './types';
+
+const Stack = createNativeStackNavigator<AppStackParamList>();
+
+function SignOutButton(): React.JSX.Element {
+  const { signOut } = useAuth();
+
+  return (
+    <Pressable
+      onPress={() => {
+        void signOut();
+      }}
+      hitSlop={8}>
+      <Text style={styles.signOut}>Sign out</Text>
+    </Pressable>
+  );
+}
+
+export function AppStack(): React.JSX.Element {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerRight: () => <SignOutButton />,
+      }}>
+      <Stack.Screen
+        name="AddVisit"
+        component={AddVisitScreen}
+        options={{ title: 'Add Visit' }}
+      />
+      <Stack.Screen
+        name="Lookup"
+        component={LookupScreen}
+        options={{ title: 'Lookup' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  signOut: {
+    color: '#2d6cdf',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
