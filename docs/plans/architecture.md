@@ -103,8 +103,9 @@ export type PlaceCandidate = { name: string; latitude: number; longitude: number
 export interface PlacesService { nearbyRestaurants(lat: number, lng: number, radiusMeters?: number): Promise<PlaceCandidate[]>; }
 
 // src/data (Supabase-backed; RLS scopes to current user automatically)
-listRestaurants(): Promise<Restaurant[]>
-historyForRestaurant(restaurantId: string): Promise<Array<{ visit: Visit; items: OrderedItem[] }>>
+export type Page<T> = { rows: T[]; nextOffset: number | null };   // pagination wrapper
+listRestaurants(opts?: { limit?: number; offset?: number; search?: string }): Promise<Page<Restaurant>>
+historyForRestaurant(restaurantId: string, opts?: { limit?: number; offset?: number }): Promise<Page<{ visit: Visit; items: OrderedItem[] }>>
 addVisitWithItems(payload): Promise<{ restaurantId: string; visitId: string }>   // supabase.rpc, atomic
 ```
 

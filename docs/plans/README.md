@@ -27,7 +27,7 @@ Backend: **Supabase** (Postgres + Auth + RLS) · Scope: **mobile only** for now.
 | [task-07](./tasks/task-07-navigation-app-shell.md) | Navigation + app shell (auth-gated) | task-05 |
 | [task-08](./tasks/task-08-add-visit-form.md) | Add Visit form screen | task-03, task-04, task-06, task-07 |
 | [task-09](./tasks/task-09-lookup-screen.md) | Lookup screen | task-06, task-07 |
-| [task-10](./tasks/task-10-testing-docs.md) | Tests & docs | task-02..task-09 |
+| [task-10](./tasks/task-10-testing-docs.md) | Tests & docs | task-02 through task-09 |
 
 ## How to assign a task to a subagent
 

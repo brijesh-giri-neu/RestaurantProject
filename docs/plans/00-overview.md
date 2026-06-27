@@ -49,7 +49,8 @@ ordered_items (id uuid PK, user_id, visit_id→visits, name, price, rating, note
 ```
 
 - Every table has `user_id` (default `auth.uid()`) and **RLS** restricting all access to the owner.
-- Restaurant **deduped** per user by `(user_id, osm_id)` when available, else GPS proximity (~50 m).
+- Restaurant **deduped** per user by `(user_id, osm_id)` when available (covers OSM-autofilled places).
+  Manual entries without an `osm_id` are not deduped in v1; GPS-proximity dedup is deferred (PostGIS — see [LEDGER.md](./LEDGER.md) F5).
 - Atomic save via a Postgres function **`add_visit_with_items(payload jsonb)`** (upsert restaurant + insert visit + items in one transaction), called from the app with `supabase.rpc`.
 - **Lookup** = select restaurant → join visits → ordered_items for that restaurant (RLS auto-scopes to user).
 

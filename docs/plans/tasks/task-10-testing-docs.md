@@ -1,6 +1,6 @@
 # Task 10 — Tests & Docs
 
-**Owner:** subagent-qa · **Depends on:** task-02..task-09 · **Parallel with:** none (last)
+**Owner:** subagent-qa · **Depends on:** task-02 through task-09 · **Parallel with:** none (last)
 
 ## Objective
 Add automated tests for pure logic and update documentation.
