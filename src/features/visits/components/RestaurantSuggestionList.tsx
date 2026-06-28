@@ -1,12 +1,8 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import type { PlaceCandidate } from '../../../services/places';
+import { Card, Row } from '../../../shared/components';
+import { colors, spacing, typography } from '../../../shared/theme';
 
 type RestaurantSuggestionListProps = {
   candidates: PlaceCandidate[];
@@ -21,10 +17,10 @@ export function RestaurantSuggestionList({
 }: RestaurantSuggestionListProps): React.JSX.Element | null {
   if (loading) {
     return (
-      <View style={styles.statusRow}>
-        <ActivityIndicator color="#2d6cdf" />
+      <Row gap={spacing.sm}>
+        <ActivityIndicator color={colors.primary} />
         <Text style={styles.statusText}>Finding nearby restaurants…</Text>
-      </View>
+      </Row>
     );
   }
 
@@ -36,15 +32,15 @@ export function RestaurantSuggestionList({
     <View style={styles.container}>
       <Text style={styles.heading}>Nearby restaurants</Text>
       {candidates.map((candidate, index) => (
-        <Pressable
+        <Card
           key={candidate.osmId ?? `${candidate.name}-${index}`}
-          style={styles.item}
-          onPress={() => onSelect(candidate)}>
+          onPress={() => onSelect(candidate)}
+          style={styles.item}>
           <Text style={styles.itemName}>{candidate.name}</Text>
           {candidate.address ? (
             <Text style={styles.itemAddress}>{candidate.address}</Text>
           ) : null}
-        </Pressable>
+        </Card>
       ))}
     </View>
   );
@@ -52,38 +48,31 @@ export function RestaurantSuggestionList({
 
 const styles = StyleSheet.create({
   container: {
-    gap: 6,
+    gap: spacing.sm,
   },
   heading: {
-    fontSize: 14,
+    ...typography.secondary,
     fontWeight: '600',
-    color: '#555',
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    color: colors.textSecondary,
   },
   statusText: {
-    color: '#555',
-    fontSize: 14,
+    ...typography.secondary,
+    color: colors.textSecondary,
   },
   item: {
-    borderWidth: 1,
-    borderColor: '#d6e0f5',
-    backgroundColor: '#f3f7ff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderColor: colors.accentBorder,
+    backgroundColor: colors.accentSurface,
+    gap: spacing.xs,
   },
   itemName: {
-    fontSize: 15,
+    ...typography.secondary,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colors.text,
   },
   itemAddress: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 2,
+    ...typography.caption,
+    color: colors.textSecondary,
   },
 });

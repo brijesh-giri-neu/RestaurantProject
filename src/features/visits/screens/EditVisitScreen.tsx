@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../../shared/components/ScreenContainer';
+import { colors, hitSlop, radii, spacing, typography } from '../../../shared/theme';
 import type { AppStackParamList } from '../../../app/navigation/types';
 import type { VisitWithContext } from '../../../data/visits';
 import { deleteVisit, getVisit } from '../../../data/visits';
@@ -152,7 +153,7 @@ export function EditVisitScreen({
     return (
       <ScreenContainer>
         <View style={styles.center}>
-          <ActivityIndicator color="#2d6cdf" />
+          <ActivityIndicator color={colors.primary} />
           <Text style={styles.statusText}>Loading visit…</Text>
         </View>
       </ScreenContainer>
@@ -164,7 +165,7 @@ export function EditVisitScreen({
       <ScreenContainer>
         <View style={styles.center}>
           <Text style={styles.error}>{loadError ?? 'Visit not found.'}</Text>
-          <Pressable onPress={() => void load()} hitSlop={8}>
+          <Pressable onPress={() => void load()} hitSlop={hitSlop}>
             <Text style={styles.link}>Retry</Text>
           </Pressable>
         </View>
@@ -190,7 +191,7 @@ export function EditVisitScreen({
           accessibilityLabel="Delete visit"
         >
           {deleting ? (
-            <ActivityIndicator color="#c0392b" />
+            <ActivityIndicator color={colors.error} />
           ) : (
             <Text style={styles.deleteButtonText}>Delete visit</Text>
           )}
@@ -205,36 +206,39 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    padding: 24,
+    gap: spacing.md,
+    padding: spacing.xl,
   },
   statusText: {
-    color: '#555',
-    fontSize: 14,
+    ...typography.secondary,
+    color: colors.textSecondary,
   },
   error: {
-    color: '#c0392b',
+    ...typography.body,
     fontSize: 15,
+    color: colors.error,
     textAlign: 'center',
   },
   link: {
-    color: '#2d6cdf',
+    ...typography.body,
     fontSize: 15,
     fontWeight: '600',
+    color: colors.primary,
   },
   deleteButton: {
     borderWidth: 1,
-    borderColor: '#c0392b',
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderColor: colors.error,
+    backgroundColor: colors.errorSurface,
+    borderRadius: radii.sm,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   deleteButtonDisabled: {
     opacity: 0.6,
   },
   deleteButtonText: {
-    color: '#c0392b',
-    fontSize: 16,
+    ...typography.secondary,
     fontWeight: '600',
+    color: colors.error,
   },
 });
