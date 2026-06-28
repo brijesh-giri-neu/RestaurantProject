@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthProvider';
 import { loginSchema, type LoginFormValues } from '../validation/authSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { FormScreen, Field } from '../../../shared/components';
+import { colors, radii, spacing, typography } from '../../../shared/theme';
 
 type LoginScreenProps = {
   onNavigateToSignup?: () => void;
@@ -46,15 +41,15 @@ export function LoginScreen({ onNavigateToSignup }: LoginScreenProps): React.JSX
   });
 
   return (
-    <View style={styles.container}>
+    <FormScreen center>
       <Text style={styles.title}>Log in</Text>
 
       <Controller
         control={control}
         name="email"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
+          <Field
+            label="Email"
             placeholder="Email"
             autoCapitalize="none"
             autoCorrect={false}
@@ -62,38 +57,40 @@ export function LoginScreen({ onNavigateToSignup }: LoginScreenProps): React.JSX
             onChangeText={onChange}
             onBlur={onBlur}
             value={value}
+            error={errors.email?.message}
           />
         )}
       />
-      {errors.email ? <Text style={styles.fieldError}>{errors.email.message}</Text> : null}
 
       <Controller
         control={control}
         name="password"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
+          <Field
+            label="Password"
             placeholder="Password"
             secureTextEntry
             autoCapitalize="none"
             onChangeText={onChange}
             onBlur={onBlur}
             value={value}
+            error={errors.password?.message}
           />
         )}
       />
-      {errors.password ? (
-        <Text style={styles.fieldError}>{errors.password.message}</Text>
-      ) : null}
 
       {authError ? <Text style={styles.authError}>{authError}</Text> : null}
 
       <Pressable
-        style={[styles.button, isSubmitting && styles.buttonDisabled]}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+          isSubmitting && styles.buttonDisabled,
+        ]}
         onPress={onSubmit}
         disabled={isSubmitting}>
         {isSubmitting ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.onPrimary} />
         ) : (
           <Text style={styles.buttonText}>Login</Text>
         )}
@@ -102,58 +99,38 @@ export function LoginScreen({ onNavigateToSignup }: LoginScreenProps): React.JSX
       <Pressable onPress={onNavigateToSignup} disabled={!onNavigateToSignup}>
         <Text style={styles.link}>Need an account? Sign up</Text>
       </Pressable>
-    </View>
+    </FormScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    gap: 8,
-  },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  fieldError: {
-    color: '#c0392b',
-    fontSize: 13,
+    ...typography.title,
+    color: colors.text,
   },
   authError: {
-    color: '#c0392b',
-    fontSize: 14,
-    marginVertical: 4,
+    ...typography.secondary,
+    color: colors.error,
   },
   button: {
-    backgroundColor: '#2d6cdf',
-    borderRadius: 8,
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
+    borderRadius: radii.sm,
+    paddingVertical: spacing.md + 2,
     alignItems: 'center',
-    marginTop: 8,
+  },
+  buttonPressed: {
+    backgroundColor: colors.primaryPressed,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.sectionTitle,
+    color: colors.onPrimary,
   },
   link: {
-    color: '#2d6cdf',
+    ...typography.secondary,
+    color: colors.primary,
     textAlign: 'center',
-    marginTop: 16,
-    fontSize: 15,
   },
 });

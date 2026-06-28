@@ -1,11 +1,13 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import {
   Controller,
   type Control,
   type FieldErrors,
 } from 'react-hook-form';
 import type { VisitFormValues } from '../validation/visitSchema';
+import { Card, Field, Row } from '../../../shared/components';
+import { colors, hitSlop, spacing, typography } from '../../../shared/theme';
 
 type ItemErrors = NonNullable<FieldErrors<VisitFormValues>['items']>[number];
 
@@ -38,75 +40,72 @@ export function OrderedItemRow({
   removable,
 }: OrderedItemRowProps): React.JSX.Element {
   return (
-    <View style={styles.row}>
-      <View style={styles.headerRow}>
+    <Card style={styles.card}>
+      <Row justify="space-between">
         <Text style={styles.itemLabel}>Item {index + 1}</Text>
         {removable ? (
-          <Pressable onPress={onRemove} hitSlop={8}>
+          <Pressable onPress={onRemove} hitSlop={hitSlop}>
             <Text style={styles.remove}>Remove</Text>
           </Pressable>
         ) : null}
-      </View>
+      </Row>
 
       <Controller
         control={control}
         name={`items.${index}.name`}
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
+          <Field
+            label="Name"
             placeholder="Name"
+            error={errors?.name?.message}
             onChangeText={onChange}
             onBlur={onBlur}
             value={value ?? ''}
           />
         )}
       />
-      {errors?.name ? (
-        <Text style={styles.fieldError}>{errors.name.message}</Text>
-      ) : null}
 
-      <Controller
-        control={control}
-        name={`items.${index}.price`}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
-            placeholder="Price (optional)"
-            keyboardType="decimal-pad"
-            onChangeText={(text) => onChange(parseNumber(text))}
-            onBlur={onBlur}
-            value={toText(value)}
-          />
-        )}
-      />
-      {errors?.price ? (
-        <Text style={styles.fieldError}>{errors.price.message}</Text>
-      ) : null}
-
-      <Controller
-        control={control}
-        name={`items.${index}.rating`}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
-            placeholder="Rating 1-5 (optional)"
-            keyboardType="number-pad"
-            onChangeText={(text) => onChange(parseNumber(text))}
-            onBlur={onBlur}
-            value={toText(value)}
-          />
-        )}
-      />
-      {errors?.rating ? (
-        <Text style={styles.fieldError}>{errors.rating.message}</Text>
-      ) : null}
+      <Row align="flex-start">
+        <Controller
+          control={control}
+          name={`items.${index}.price`}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field
+              containerStyle={styles.flex}
+              label="Price"
+              placeholder="Optional"
+              keyboardType="decimal-pad"
+              error={errors?.price?.message}
+              onChangeText={(text) => onChange(parseNumber(text))}
+              onBlur={onBlur}
+              value={toText(value)}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name={`items.${index}.rating`}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field
+              containerStyle={styles.flex}
+              label="Rating 1-5"
+              placeholder="Optional"
+              keyboardType="number-pad"
+              error={errors?.rating?.message}
+              onChangeText={(text) => onChange(parseNumber(text))}
+              onBlur={onBlur}
+              value={toText(value)}
+            />
+          )}
+        />
+      </Row>
 
       <Controller
         control={control}
         name={`items.${index}.notes`}
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={[styles.input, styles.multiline]}
+          <Field
+            label="Notes"
             placeholder="Notes (optional)"
             multiline
             onChangeText={onChange}
@@ -115,48 +114,25 @@ export function OrderedItemRow({
           />
         )}
       />
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 10,
-    padding: 12,
-    gap: 8,
-    backgroundColor: '#fafafa',
+  card: {
+    gap: spacing.md,
+    backgroundColor: colors.surfaceMuted,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  flex: {
+    flex: 1,
   },
   itemLabel: {
-    fontSize: 15,
-    fontWeight: '600',
+    ...typography.sectionTitle,
+    color: colors.text,
   },
   remove: {
-    color: '#c0392b',
-    fontSize: 14,
+    ...typography.secondary,
     fontWeight: '600',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  multiline: {
-    minHeight: 60,
-    textAlignVertical: 'top',
-  },
-  fieldError: {
-    color: '#c0392b',
-    fontSize: 13,
+    color: colors.error,
   },
 });

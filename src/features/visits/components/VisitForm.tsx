@@ -2,15 +2,20 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ScreenContainer } from '../../../shared/components/ScreenContainer';
+import { FormScreen, Field, Row } from '../../../shared/components';
+import {
+  colors,
+  hitSlop,
+  radii,
+  spacing,
+  typography,
+} from '../../../shared/theme';
 import type { PlaceCandidate } from '../../../services/places';
 import { visitSchema, type VisitFormValues } from '../validation/visitSchema';
 import { useCurrentLocation } from '../hooks/useCurrentLocation';
@@ -84,89 +89,84 @@ export function VisitForm({
   });
 
   return (
-    <ScreenContainer>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>{title}</Text>
+    <FormScreen>
+      <Text style={styles.title}>{title}</Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Restaurant</Text>
-          {restaurantEditable ? (
-            <EditableRestaurant
-              control={control}
-              setValue={setValue}
-              getValues={getValues}
-              errors={errors}
-            />
-          ) : (
-            <Controller
-              control={control}
-              name="restaurant.name"
-              render={({ field: { value } }) => (
-                <Text style={styles.readOnly}>{value}</Text>
-              )}
-            />
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ordered items</Text>
-          {fields.map((field, index) => (
-            <OrderedItemRow
-              key={field.id}
-              control={control}
-              index={index}
-              errors={errors.items?.[index]}
-              onRemove={() => remove(index)}
-              removable={fields.length > 1}
-            />
-          ))}
-          {typeof errors.items?.message === 'string' ? (
-            <Text style={styles.fieldError}>{errors.items.message}</Text>
-          ) : null}
-
-          <Pressable
-            style={styles.secondaryButton}
-            onPress={() => append({ ...emptyItem })}>
-            <Text style={styles.secondaryButtonText}>+ Add item</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Visit notes</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Restaurant</Text>
+        {restaurantEditable ? (
+          <EditableRestaurant
+            control={control}
+            setValue={setValue}
+            getValues={getValues}
+            errors={errors}
+          />
+        ) : (
           <Controller
             control={control}
-            name="notes"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={[styles.input, styles.multiline]}
-                placeholder="Notes (optional)"
-                multiline
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value ?? ''}
-              />
+            name="restaurant.name"
+            render={({ field: { value } }) => (
+              <Text style={styles.readOnly}>{value}</Text>
             )}
           />
-        </View>
+        )}
+      </View>
 
-        {saveError ? <Text style={styles.authError}>{saveError}</Text> : null}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Ordered items</Text>
+        {fields.map((field, index) => (
+          <OrderedItemRow
+            key={field.id}
+            control={control}
+            index={index}
+            errors={errors.items?.[index]}
+            onRemove={() => remove(index)}
+            removable={fields.length > 1}
+          />
+        ))}
+        {typeof errors.items?.message === 'string' ? (
+          <Text style={styles.fieldError}>{errors.items.message}</Text>
+        ) : null}
 
         <Pressable
-          style={[styles.button, saving && styles.buttonDisabled]}
-          onPress={submit}
-          disabled={saving}>
-          {saving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>{submitLabel}</Text>
-          )}
+          style={styles.secondaryButton}
+          onPress={() => append({ ...emptyItem })}>
+          <Text style={styles.secondaryButtonText}>+ Add item</Text>
         </Pressable>
+      </View>
 
-        {footer}
-      </ScrollView>
-    </ScreenContainer>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Visit notes</Text>
+        <Controller
+          control={control}
+          name="notes"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field
+              placeholder="Notes (optional)"
+              multiline
+              onChangeText={onChange}
+              onBlur={onBlur}
+              value={value ?? ''}
+            />
+          )}
+        />
+      </View>
+
+      {saveError ? <Text style={styles.authError}>{saveError}</Text> : null}
+
+      <Pressable
+        style={[styles.button, saving && styles.buttonDisabled]}
+        onPress={submit}
+        disabled={saving}>
+        {saving ? (
+          <ActivityIndicator color={colors.onPrimary} />
+        ) : (
+          <Text style={styles.buttonText}>{submitLabel}</Text>
+        )}
+      </Pressable>
+
+      {footer}
+    </FormScreen>
   );
 }
 
@@ -213,28 +213,28 @@ function EditableRestaurant({
   return (
     <>
       {locationLoading ? (
-        <View style={styles.statusRow}>
-          <ActivityIndicator color="#2d6cdf" />
+        <Row gap={spacing.sm}>
+          <ActivityIndicator color={colors.primary} />
           <Text style={styles.statusText}>Getting your location…</Text>
-        </View>
+        </Row>
       ) : null}
 
       {locationError ? (
-        <View style={styles.statusRow}>
+        <Row gap={spacing.sm}>
           <Text style={styles.warning}>{locationError}</Text>
-          <Pressable onPress={refresh} hitSlop={8}>
+          <Pressable onPress={refresh} hitSlop={hitSlop}>
             <Text style={styles.link}>Retry</Text>
           </Pressable>
-        </View>
+        </Row>
       ) : null}
 
       <Controller
         control={control}
         name="restaurant.name"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={styles.input}
+          <Field
             placeholder="Restaurant name"
+            error={errors.restaurant?.name?.message}
             onChangeText={(text) => {
               onChange(text);
               // Manual edit => source manual; OSM linkage cleared.
@@ -248,9 +248,6 @@ function EditableRestaurant({
           />
         )}
       />
-      {errors.restaurant?.name ? (
-        <Text style={styles.fieldError}>{errors.restaurant.name.message}</Text>
-      ) : null}
       {errors.restaurant?.latitude || errors.restaurant?.longitude ? (
         <Text style={styles.fieldError}>
           A GPS location is required. Tap Retry to fetch it.
@@ -267,89 +264,68 @@ function EditableRestaurant({
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    gap: 16,
-  },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...typography.title,
+    color: colors.text,
   },
   section: {
-    gap: 8,
+    gap: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    ...typography.sectionTitle,
+    color: colors.text,
   },
   statusText: {
-    color: '#555',
-    fontSize: 14,
+    ...typography.secondary,
+    color: colors.textSecondary,
   },
   warning: {
-    color: '#b9770e',
-    fontSize: 14,
+    ...typography.secondary,
+    color: colors.warning,
     flexShrink: 1,
   },
   readOnly: {
-    fontSize: 16,
+    ...typography.body,
     fontWeight: '600',
-    color: '#1a1a1a',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  multiline: {
-    minHeight: 70,
-    textAlignVertical: 'top',
+    color: colors.text,
   },
   fieldError: {
-    color: '#c0392b',
-    fontSize: 13,
+    ...typography.caption,
+    color: colors.error,
   },
   authError: {
-    color: '#c0392b',
-    fontSize: 14,
+    ...typography.secondary,
+    color: colors.error,
   },
   button: {
-    backgroundColor: '#2d6cdf',
-    borderRadius: 8,
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
+    borderRadius: radii.sm,
+    paddingVertical: spacing.md + 2,
     alignItems: 'center',
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    ...typography.body,
     fontWeight: '600',
+    color: colors.onPrimary,
   },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: '#2d6cdf',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderColor: colors.primary,
+    borderRadius: radii.sm,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: '#2d6cdf',
-    fontSize: 15,
+    ...typography.secondary,
     fontWeight: '600',
+    color: colors.primary,
   },
   link: {
-    color: '#2d6cdf',
-    fontSize: 14,
+    ...typography.secondary,
     fontWeight: '600',
+    color: colors.primary,
   },
 });

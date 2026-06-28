@@ -11,7 +11,13 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../../../app/navigation/types';
-import { ScreenContainer } from '../../../shared/components/ScreenContainer';
+import { ScreenContainer, Card, Row } from '../../../shared/components';
+import {
+  colors,
+  spacing,
+  typography,
+  hitSlop,
+} from '../../../shared/theme';
 import { useVisitsBrowse } from '../hooks/useVisitsBrowse';
 import { deleteVisit, type VisitWithContext } from '../../../data';
 
@@ -79,31 +85,30 @@ function VisitRow({
 }): React.JSX.Element {
   const total = formatTotal(entry.items);
   return (
-    <Pressable onPress={onPress} style={styles.row}>
-      <View style={styles.rowHeader}>
+    <Card onPress={onPress} style={styles.row}>
+      <Row justify="space-between" style={styles.rowLine}>
         <Text style={styles.restaurantName} numberOfLines={1}>
           {entry.restaurant.name}
         </Text>
         <Text style={styles.date}>{formatDate(entry.visit.visitedAt)}</Text>
-      </View>
-      <View style={styles.rowFooter}>
+      </Row>
+      <Row justify="space-between" style={styles.rowFooter}>
         <Text style={styles.summary} numberOfLines={1}>
           {summarizeItems(entry.items)}
         </Text>
         {total ? <Text style={styles.total}>{total}</Text> : null}
-      </View>
-      <View style={styles.rowActions}>
+      </Row>
+      <Row justify="flex-end" style={styles.rowActions}>
         <Pressable
           onPress={onDelete}
-          hitSlop={8}
-          style={styles.deleteButton}
+          hitSlop={hitSlop}
           accessibilityRole="button"
           accessibilityLabel="Delete visit"
         >
           <Text style={styles.deleteButtonText}>Delete</Text>
         </Pressable>
-      </View>
-    </Pressable>
+      </Row>
+    </Card>
   );
 }
 
@@ -165,7 +170,7 @@ export function BrowseVisitsScreen({ navigation }: Props): React.JSX.Element {
 
   if (loading) {
     return (
-      <ScreenContainer style={styles.container}>
+      <ScreenContainer padded>
         <View style={styles.centered}>
           <ActivityIndicator />
         </View>
@@ -174,7 +179,7 @@ export function BrowseVisitsScreen({ navigation }: Props): React.JSX.Element {
   }
 
   return (
-    <ScreenContainer style={styles.container}>
+    <ScreenContainer padded>
       <FlatList
         data={rows}
         keyExtractor={(entry) => entry.visit.id}
@@ -202,88 +207,66 @@ export function BrowseVisitsScreen({ navigation }: Props): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-  },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: spacing.xl,
   },
   emptyContent: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.xl,
   },
   emptyText: {
-    fontSize: 15,
-    color: '#777',
+    ...typography.secondary,
+    color: colors.textMuted,
     textAlign: 'center',
   },
   footer: {
-    paddingVertical: 16,
+    paddingVertical: spacing.lg,
   },
   row: {
-    borderWidth: 1,
-    borderColor: '#e3e3e3',
-    borderRadius: 12,
-    marginBottom: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    marginBottom: spacing.md,
   },
-  rowHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  rowLine: {
+    width: '100%',
   },
   restaurantName: {
     flex: 1,
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#111',
+    ...typography.sectionTitle,
+    color: colors.text,
   },
   date: {
-    fontSize: 13,
-    color: '#888',
-    marginLeft: 8,
+    ...typography.caption,
+    color: colors.textMuted,
+    marginLeft: spacing.sm,
   },
   rowFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
+    width: '100%',
+    marginTop: spacing.sm,
   },
   summary: {
     flex: 1,
-    fontSize: 14,
-    color: '#555',
+    ...typography.secondary,
+    color: colors.textSecondary,
   },
   total: {
-    fontSize: 14,
+    ...typography.secondary,
     fontWeight: '600',
-    color: '#222',
-    marginLeft: 8,
+    color: colors.text,
+    marginLeft: spacing.sm,
   },
   rowActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 10,
-  },
-  deleteButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: '#fdecea',
+    width: '100%',
+    marginTop: spacing.sm,
   },
   deleteButtonText: {
-    fontSize: 14,
+    ...typography.secondary,
     fontWeight: '600',
-    color: '#c0392b',
+    color: colors.error,
   },
 });

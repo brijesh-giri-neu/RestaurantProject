@@ -11,7 +11,18 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../../../app/navigation/types';
-import { ScreenContainer } from '../../../shared/components/ScreenContainer';
+import {
+  ScreenContainer,
+  Card,
+  Row,
+} from '../../../shared/components';
+import {
+  colors,
+  spacing,
+  radii,
+  typography,
+  hitSlop,
+} from '../../../shared/theme';
 import {
   useRestaurantHistory,
   type VisitHistoryRow,
@@ -61,17 +72,27 @@ function ListFooterSpinner({ loading }: { loading: boolean }): React.JSX.Element
   );
 }
 
-function OrderedItemRow({ item }: { item: OrderedItem }): React.JSX.Element {
-  const price = formatPrice(item.price);
-  const rating = formatRating(item.rating);
+function ItemMeta({
+  price,
+  rating,
+}: {
+  price: string | null;
+  rating: string | null;
+}): React.JSX.Element {
   return (
-    <View style={styles.itemRow}>
+    <Row gap={spacing.sm} style={styles.itemMeta}>
+      {price ? <Text style={styles.itemMetaText}>{price}</Text> : null}
+      {rating ? <Text style={styles.itemMetaText}>{rating}</Text> : null}
+    </Row>
+  );
+}
+
+function OrderedItemRow({ item }: { item: OrderedItem }): React.JSX.Element {
+  return (
+    <Row justify="space-between" style={styles.itemRow}>
       <Text style={styles.itemName}>{item.name}</Text>
-      <View style={styles.itemMeta}>
-        {price ? <Text style={styles.itemMetaText}>{price}</Text> : null}
-        {rating ? <Text style={styles.itemMetaText}>{rating}</Text> : null}
-      </View>
-    </View>
+      <ItemMeta price={formatPrice(item.price)} rating={formatRating(item.rating)} />
+    </Row>
   );
 }
 
@@ -82,20 +103,20 @@ function DishRow({
   hit: DishHit;
   onPress: (hit: DishHit) => void;
 }): React.JSX.Element {
-  const price = formatPrice(hit.item.price);
-  const rating = formatRating(hit.item.rating);
   return (
-    <Pressable onPress={() => onPress(hit)} style={styles.dishRow}>
-      <View style={styles.dishMain}>
-        <Text style={styles.dishName}>{hit.item.name}</Text>
-        <Text style={styles.dishSubtitle} numberOfLines={1}>
-          {hit.restaurant.name} · {formatDate(hit.visit.visitedAt)}
-        </Text>
-      </View>
-      <View style={styles.itemMeta}>
-        {price ? <Text style={styles.itemMetaText}>{price}</Text> : null}
-        {rating ? <Text style={styles.itemMetaText}>{rating}</Text> : null}
-      </View>
+    <Pressable onPress={() => onPress(hit)}>
+      <Row justify="space-between" style={styles.dishRow}>
+        <View style={styles.dishMain}>
+          <Text style={styles.dishName}>{hit.item.name}</Text>
+          <Text style={styles.dishSubtitle} numberOfLines={1}>
+            {hit.restaurant.name} · {formatDate(hit.visit.visitedAt)}
+          </Text>
+        </View>
+        <ItemMeta
+          price={formatPrice(hit.item.price)}
+          rating={formatRating(hit.item.rating)}
+        />
+      </Row>
     </Pressable>
   );
 }
@@ -105,17 +126,19 @@ function VisitCard({ entry }: { entry: VisitHistoryRow }): React.JSX.Element {
   const itemCount = entry.items.length;
 
   return (
-    <View style={styles.visitCard}>
+    <Card flush style={styles.visitCard}>
       <Pressable
         onPress={() => setExpanded((prev) => !prev)}
         style={styles.visitHeader}>
-        <View style={styles.visitHeaderText}>
-          <Text style={styles.visitDate}>{formatDate(entry.visit.visitedAt)}</Text>
-          <Text style={styles.visitSubtitle}>
-            {itemCount} {itemCount === 1 ? 'item' : 'items'}
-          </Text>
-        </View>
-        <Text style={styles.chevron}>{expanded ? '▾' : '▸'}</Text>
+        <Row justify="space-between" style={styles.visitHeaderRow}>
+          <View style={styles.visitHeaderText}>
+            <Text style={styles.visitDate}>{formatDate(entry.visit.visitedAt)}</Text>
+            <Text style={styles.visitSubtitle}>
+              {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            </Text>
+          </View>
+          <Text style={styles.chevron}>{expanded ? '▾' : '▸'}</Text>
+        </Row>
       </Pressable>
       {expanded ? (
         <View style={styles.visitItems}>
@@ -129,7 +152,7 @@ function VisitCard({ entry }: { entry: VisitHistoryRow }): React.JSX.Element {
           ) : null}
         </View>
       ) : null}
-    </View>
+    </Card>
   );
 }
 
@@ -188,24 +211,17 @@ export function LookupScreen({ navigation }: Props): React.JSX.Element {
     [navigation],
   );
 
-  const renderDish = useCallback(
-    ({ item }: { item: DishHit }) => (
-      <DishRow hit={item} onPress={openDishVisit} />
-    ),
-    [openDishVisit],
-  );
-
   const renderRestaurant = useCallback(
     ({ item }: { item: Restaurant }) => (
-      <Pressable
-        onPress={() => selectRestaurant(item.id)}
-        style={styles.restaurantRow}>
-        <Text style={styles.restaurantName}>{item.name}</Text>
-        {item.address ? (
-          <Text style={styles.restaurantAddress} numberOfLines={1}>
-            {item.address}
-          </Text>
-        ) : null}
+      <Pressable onPress={() => selectRestaurant(item.id)}>
+        <View style={styles.restaurantRow}>
+          <Text style={styles.restaurantName}>{item.name}</Text>
+          {item.address ? (
+            <Text style={styles.restaurantAddress} numberOfLines={1}>
+              {item.address}
+            </Text>
+          ) : null}
+        </View>
       </Pressable>
     ),
     [selectRestaurant],
@@ -219,9 +235,9 @@ export function LookupScreen({ navigation }: Props): React.JSX.Element {
   // --- History view (a restaurant is selected) ---
   if (selectedId) {
     return (
-      <ScreenContainer style={styles.container}>
+      <ScreenContainer padded>
         <View style={styles.historyHeader}>
-          <Pressable onPress={clearSelection} hitSlop={8}>
+          <Pressable onPress={clearSelection} hitSlop={hitSlop}>
             <Text style={styles.backLink}>‹ Restaurants</Text>
           </Pressable>
           <Text style={styles.historyTitle} numberOfLines={1}>
@@ -263,91 +279,97 @@ export function LookupScreen({ navigation }: Props): React.JSX.Element {
   // --- Restaurant list view (with dish search when a term is entered) ---
   const isSearching = search.trim().length > 0;
 
+  // When searching, the Dishes section rides along as the footer of the single
+  // restaurants FlatList. This collapses the old two-FlatList 50/50 layout into
+  // one vertical scroll: Restaurants first, then Dishes. Dishes are fully loaded
+  // (no pagination) so they render as a plain .map — never a nested FlatList.
+  const dishesFooter = isSearching ? (
+    <View style={styles.dishesSection}>
+      <Text style={styles.sectionTitle}>Dishes</Text>
+      {dishesLoading ? (
+        <View style={styles.sectionLoading}>
+          <ActivityIndicator />
+        </View>
+      ) : dishes.length === 0 ? (
+        <Text style={styles.emptyInlineCentered}>
+          No dishes match your search.
+        </Text>
+      ) : (
+        dishes.map((hit) => (
+          <DishRow key={hit.item.id} hit={hit} onPress={openDishVisit} />
+        ))
+      )}
+    </View>
+  ) : null;
+
+  const restaurantsFooter = (
+    <>
+      <ListFooterSpinner loading={restaurantsLoadingMore} />
+      {dishesFooter}
+    </>
+  );
+
   return (
-    <ScreenContainer style={styles.container}>
+    <ScreenContainer padded>
       <TextInput
         style={styles.searchInput}
         placeholder="Search restaurants or dishes"
+        placeholderTextColor={colors.textMuted}
         value={search}
         onChangeText={setSearch}
         autoCorrect={false}
         clearButtonMode="while-editing"
       />
-      <View style={styles.section}>
-        {isSearching ? <Text style={styles.sectionTitle}>Restaurants</Text> : null}
-        {restaurantsLoading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator />
-          </View>
-        ) : (
-          <FlatList
-            data={restaurants}
-            keyExtractor={(item) => item.id}
-            renderItem={renderRestaurant}
-            onEndReached={() => {
-              void loadMoreRestaurants();
-            }}
-            onEndReachedThreshold={END_REACHED_THRESHOLD}
-            onRefresh={() => {
-              void refreshRestaurants();
-            }}
-            refreshing={restaurantsRefreshing}
-            contentContainerStyle={
-              restaurants.length === 0 ? styles.emptyContent : styles.listContent
-            }
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>
-                {isSearching
-                  ? 'No restaurants match your search.'
-                  : 'No restaurants yet. Add a visit to get started.'}
-              </Text>
-            }
-            ListFooterComponent={
-              <ListFooterSpinner loading={restaurantsLoadingMore} />
-            }
-          />
-        )}
-      </View>
-      {isSearching ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dishes</Text>
-          {dishesLoading ? (
-            <View style={styles.centered}>
-              <ActivityIndicator />
-            </View>
-          ) : (
-            <FlatList
-              data={dishes}
-              keyExtractor={(item) => item.item.id}
-              renderItem={renderDish}
-              contentContainerStyle={
-                dishes.length === 0 ? styles.emptyContent : styles.listContent
-              }
-              ListEmptyComponent={
-                <Text style={styles.emptyText}>No dishes match your search.</Text>
-              }
-            />
-          )}
+      {restaurantsLoading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator />
         </View>
-      ) : null}
+      ) : (
+        <FlatList
+          data={restaurants}
+          keyExtractor={(item) => item.id}
+          renderItem={renderRestaurant}
+          ListHeaderComponent={
+            isSearching ? (
+              <Text style={styles.sectionTitle}>Restaurants</Text>
+            ) : null
+          }
+          onEndReached={() => {
+            void loadMoreRestaurants();
+          }}
+          onEndReachedThreshold={END_REACHED_THRESHOLD}
+          onRefresh={() => {
+            void refreshRestaurants();
+          }}
+          refreshing={restaurantsRefreshing}
+          contentContainerStyle={
+            restaurants.length === 0 ? styles.emptyContent : styles.listContent
+          }
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {isSearching
+                ? 'No restaurants match your search.'
+                : 'No restaurants yet. Add a visit to get started.'}
+            </Text>
+          }
+          ListFooterComponent={restaurantsFooter}
+        />
+      )}
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-  },
   searchInput: {
     borderWidth: 1,
-    borderColor: '#d0d0d0',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    marginBottom: 12,
-    backgroundColor: '#fafafa',
+    borderColor: colors.borderStrong,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    ...typography.body,
+    color: colors.text,
+    marginBottom: spacing.md,
+    backgroundColor: colors.surfaceMuted,
   },
   centered: {
     flex: 1,
@@ -355,154 +377,146 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: spacing.xl,
   },
   emptyContent: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.xl,
   },
   emptyText: {
-    fontSize: 15,
-    color: '#777',
+    ...typography.secondary,
+    color: colors.textMuted,
     textAlign: 'center',
   },
   emptyInline: {
-    fontSize: 14,
-    color: '#888',
+    ...typography.caption,
+    color: colors.textMuted,
     fontStyle: 'italic',
   },
-  footer: {
-    paddingVertical: 16,
+  emptyInlineCentered: {
+    ...typography.secondary,
+    color: colors.textMuted,
+    textAlign: 'center',
+    paddingVertical: spacing.lg,
   },
-  section: {
-    flex: 1,
+  footer: {
+    paddingVertical: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#888',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
+    ...typography.label,
+    marginBottom: spacing.xs,
+  },
+  dishesSection: {
+    marginTop: spacing.lg,
+  },
+  sectionLoading: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
   },
   restaurantRow: {
-    paddingVertical: 14,
+    paddingVertical: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e3e3e3',
+    borderBottomColor: colors.border,
   },
   dishRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e3e3e3',
+    borderBottomColor: colors.border,
   },
   dishMain: {
     flex: 1,
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   dishName: {
-    fontSize: 16,
+    ...typography.body,
     fontWeight: '600',
-    color: '#111',
+    color: colors.text,
   },
   dishSubtitle: {
-    fontSize: 13,
-    color: '#777',
-    marginTop: 2,
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs / 2,
   },
   restaurantName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#111',
+    ...typography.sectionTitle,
+    color: colors.text,
   },
   restaurantAddress: {
-    fontSize: 13,
-    color: '#777',
-    marginTop: 2,
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs / 2,
   },
   historyHeader: {
-    marginBottom: 8,
-    gap: 4,
+    marginBottom: spacing.sm,
+    gap: spacing.xs,
   },
   backLink: {
-    fontSize: 15,
-    color: '#2d6cdf',
+    ...typography.secondary,
+    color: colors.primary,
     fontWeight: '600',
   },
   historyTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111',
+    ...typography.heading,
+    color: colors.text,
   },
   visitCard: {
-    borderWidth: 1,
-    borderColor: '#e3e3e3',
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
+    marginBottom: spacing.md,
   },
   visitHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  visitHeaderRow: {
+    width: '100%',
   },
   visitHeaderText: {
     flex: 1,
   },
   visitDate: {
-    fontSize: 16,
+    ...typography.body,
     fontWeight: '600',
-    color: '#111',
+    color: colors.text,
   },
   visitSubtitle: {
-    fontSize: 13,
-    color: '#888',
-    marginTop: 2,
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs / 2,
   },
   chevron: {
-    fontSize: 16,
-    color: '#888',
-    marginLeft: 8,
+    ...typography.body,
+    color: colors.textMuted,
+    marginLeft: spacing.sm,
   },
   visitItems: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#eee',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    gap: 4,
+    borderTopColor: colors.hairline,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
   },
   itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 6,
+    paddingVertical: spacing.xs + 2,
   },
   itemName: {
     flex: 1,
-    fontSize: 15,
-    color: '#222',
+    ...typography.secondary,
+    color: colors.text,
   },
   itemMeta: {
-    flexDirection: 'row',
-    gap: 10,
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
   itemMetaText: {
-    fontSize: 14,
-    color: '#555',
+    ...typography.secondary,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   visitNotes: {
-    fontSize: 13,
-    color: '#777',
+    ...typography.caption,
+    color: colors.textMuted,
     fontStyle: 'italic',
-    marginTop: 6,
+    marginTop: spacing.sm,
   },
 });
