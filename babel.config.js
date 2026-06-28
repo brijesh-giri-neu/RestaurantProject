@@ -10,5 +10,8 @@ module.exports = {
         allowUndefined: true,
       },
     ],
+    // zod v4 ships `export * as` namespace re-exports that Metro's preset
+    // doesn't transform by default; this plugin handles them.
+    '@babel/plugin-transform-export-namespace-from',
   ],
 };
