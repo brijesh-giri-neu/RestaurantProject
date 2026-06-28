@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -16,6 +16,8 @@ import {
   useRestaurantHistory,
   type VisitHistoryRow,
 } from '../hooks/useRestaurantHistory';
+import { useSearch } from '../hooks/useSearch';
+import type { DishHit } from '../../../data/search';
 import type { OrderedItem, Restaurant } from '../../../data';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Lookup'>;
@@ -73,6 +75,31 @@ function OrderedItemRow({ item }: { item: OrderedItem }): React.JSX.Element {
   );
 }
 
+function DishRow({
+  hit,
+  onPress,
+}: {
+  hit: DishHit;
+  onPress: (hit: DishHit) => void;
+}): React.JSX.Element {
+  const price = formatPrice(hit.item.price);
+  const rating = formatRating(hit.item.rating);
+  return (
+    <Pressable onPress={() => onPress(hit)} style={styles.dishRow}>
+      <View style={styles.dishMain}>
+        <Text style={styles.dishName}>{hit.item.name}</Text>
+        <Text style={styles.dishSubtitle} numberOfLines={1}>
+          {hit.restaurant.name} · {formatDate(hit.visit.visitedAt)}
+        </Text>
+      </View>
+      <View style={styles.itemMeta}>
+        {price ? <Text style={styles.itemMetaText}>{price}</Text> : null}
+        {rating ? <Text style={styles.itemMetaText}>{rating}</Text> : null}
+      </View>
+    </Pressable>
+  );
+}
+
 function VisitCard({ entry }: { entry: VisitHistoryRow }): React.JSX.Element {
   const [expanded, setExpanded] = useState(false);
   const itemCount = entry.items.length;
@@ -106,7 +133,13 @@ function VisitCard({ entry }: { entry: VisitHistoryRow }): React.JSX.Element {
   );
 }
 
-export function LookupScreen(_props: Props): React.JSX.Element {
+export function LookupScreen({ navigation }: Props): React.JSX.Element {
+  const {
+    term: dishTerm,
+    setTerm: setDishTerm,
+    dishes,
+    loading: dishesLoading,
+  } = useSearch();
   const {
     search,
     setSearch,
@@ -140,6 +173,27 @@ export function LookupScreen(_props: Props): React.JSX.Element {
   );
 
   const selectedRestaurant = restaurants.find((r) => r.id === selectedId);
+
+  // Keep the dish search in sync with the (debounced) restaurant search box.
+  useEffect(() => {
+    if (dishTerm !== search) {
+      setDishTerm(search);
+    }
+  }, [search, dishTerm, setDishTerm]);
+
+  const openDishVisit = useCallback(
+    (hit: DishHit) => {
+      navigation.navigate('EditVisit', { visitId: hit.visit.id });
+    },
+    [navigation],
+  );
+
+  const renderDish = useCallback(
+    ({ item }: { item: DishHit }) => (
+      <DishRow hit={item} onPress={openDishVisit} />
+    ),
+    [openDishVisit],
+  );
 
   const renderRestaurant = useCallback(
     ({ item }: { item: Restaurant }) => (
@@ -206,47 +260,76 @@ export function LookupScreen(_props: Props): React.JSX.Element {
     );
   }
 
-  // --- Restaurant list view ---
+  // --- Restaurant list view (with dish search when a term is entered) ---
+  const isSearching = search.trim().length > 0;
+
   return (
     <ScreenContainer style={styles.container}>
       <TextInput
         style={styles.searchInput}
-        placeholder="Search restaurants"
+        placeholder="Search restaurants or dishes"
         value={search}
         onChangeText={setSearch}
         autoCorrect={false}
         clearButtonMode="while-editing"
       />
-      {restaurantsLoading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator />
+      <View style={styles.section}>
+        {isSearching ? <Text style={styles.sectionTitle}>Restaurants</Text> : null}
+        {restaurantsLoading ? (
+          <View style={styles.centered}>
+            <ActivityIndicator />
+          </View>
+        ) : (
+          <FlatList
+            data={restaurants}
+            keyExtractor={(item) => item.id}
+            renderItem={renderRestaurant}
+            onEndReached={() => {
+              void loadMoreRestaurants();
+            }}
+            onEndReachedThreshold={END_REACHED_THRESHOLD}
+            onRefresh={() => {
+              void refreshRestaurants();
+            }}
+            refreshing={restaurantsRefreshing}
+            contentContainerStyle={
+              restaurants.length === 0 ? styles.emptyContent : styles.listContent
+            }
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>
+                {isSearching
+                  ? 'No restaurants match your search.'
+                  : 'No restaurants yet. Add a visit to get started.'}
+              </Text>
+            }
+            ListFooterComponent={
+              <ListFooterSpinner loading={restaurantsLoadingMore} />
+            }
+          />
+        )}
+      </View>
+      {isSearching ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Dishes</Text>
+          {dishesLoading ? (
+            <View style={styles.centered}>
+              <ActivityIndicator />
+            </View>
+          ) : (
+            <FlatList
+              data={dishes}
+              keyExtractor={(item) => item.item.id}
+              renderItem={renderDish}
+              contentContainerStyle={
+                dishes.length === 0 ? styles.emptyContent : styles.listContent
+              }
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>No dishes match your search.</Text>
+              }
+            />
+          )}
         </View>
-      ) : (
-        <FlatList
-          data={restaurants}
-          keyExtractor={(item) => item.id}
-          renderItem={renderRestaurant}
-          onEndReached={() => {
-            void loadMoreRestaurants();
-          }}
-          onEndReachedThreshold={END_REACHED_THRESHOLD}
-          onRefresh={() => {
-            void refreshRestaurants();
-          }}
-          refreshing={restaurantsRefreshing}
-          contentContainerStyle={
-            restaurants.length === 0 ? styles.emptyContent : styles.listContent
-          }
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              {search
-                ? 'No restaurants match your search.'
-                : 'No restaurants yet. Add a visit to get started.'}
-            </Text>
-          }
-          ListFooterComponent={<ListFooterSpinner loading={restaurantsLoadingMore} />}
-        />
-      )}
+      ) : null}
     </ScreenContainer>
   );
 }
@@ -293,10 +376,43 @@ const styles = StyleSheet.create({
   footer: {
     paddingVertical: 16,
   },
+  section: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#888',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
   restaurantRow: {
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#e3e3e3',
+  },
+  dishRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#e3e3e3',
+  },
+  dishMain: {
+    flex: 1,
+    marginRight: 8,
+  },
+  dishName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111',
+  },
+  dishSubtitle: {
+    fontSize: 13,
+    color: '#777',
+    marginTop: 2,
   },
   restaurantName: {
     fontSize: 17,
