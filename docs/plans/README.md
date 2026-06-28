@@ -29,6 +29,16 @@ Backend: **Supabase** (Postgres + Auth + RLS) · Scope: **mobile only** for now.
 | [task-09](./tasks/task-09-lookup-screen.md) | Lookup screen | task-06, task-07 |
 | [task-10](./tasks/task-10-testing-docs.md) | Tests & docs | task-02 through task-09 |
 
+### v2 — additional screens (planned)
+
+| ID | Task | Depends on |
+| -- | ---- | ---------- |
+| [task-11](./tasks/task-11-home-screen.md) | Home screen & nav hub | v1 |
+| [task-12](./tasks/task-12-browse-visits.md) | Browse past visits | task-06, task-11 |
+| [task-13](./tasks/task-13-edit-visit.md) | Edit a visit | task-12, task-08 |
+| [task-14](./tasks/task-14-delete-visit.md) | Delete a visit | task-12 |
+| [task-15](./tasks/task-15-search-restaurants-and-dishes.md) | Search restaurants & dishes | task-06 |
+
 ## How to assign a task to a subagent
 
 Each task file is self-contained. To dispatch one:

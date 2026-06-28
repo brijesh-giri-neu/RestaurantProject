@@ -67,6 +67,29 @@ Automated tests + documentation.
 
 ---
 
+## v2 — additional screens & features (planned)
+
+Discussed enhancements beyond the first requirement. Depend on v1 (all done).
+
+### Feature 8 — Home & navigation hub
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| [task-11 — Home screen & nav hub](./tasks/task-11-home-screen.md) | ⬜ Not started | Landing screen after login → Add Visit / Browse / Lookup; Home becomes initial route. |
+
+### Feature 9 — Browse / edit / delete visits
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| [task-12 — Browse past visits](./tasks/task-12-browse-visits.md) | ⬜ Not started | Paginated, virtualized list of all visits; `data.listVisits`. |
+| [task-13 — Edit a visit](./tasks/task-13-edit-visit.md) | ⬜ Not started | Edit notes/date/items; shared `VisitForm`; RPC `update_visit_with_items` (migration 0004). |
+| [task-14 — Delete a visit](./tasks/task-14-delete-visit.md) | ⬜ Not started | Confirm + `data.deleteVisit`; items cascade. |
+
+### Feature 10 — Search (restaurants + dishes)
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| [task-15 — Search restaurants & dishes](./tasks/task-15-search-restaurants-and-dishes.md) | ⬜ Not started | Extend search to dish (ordered-item) names; optional pg_trgm indexes (migration 0005). |
+
+---
+
 ## Cross-cutting requirements (folded into the tasks above)
 
 | Requirement | Where | Status |
