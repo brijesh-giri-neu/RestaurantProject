@@ -1,10 +1,13 @@
 import { supabase } from '../lib/supabase';
 import {
   mapOrderedItem,
+  mapRestaurant,
   mapVisit,
   type OrderedItem,
   type OrderedItemRow,
   type Page,
+  type Restaurant,
+  type RestaurantRow,
   type Visit,
   type VisitRow,
 } from './types';
@@ -12,6 +15,21 @@ import {
 const DEFAULT_LIMIT = 20;
 
 type VisitWithItemsRow = VisitRow & { ordered_items: OrderedItemRow[] };
+
+type VisitWithContextRow = VisitRow & {
+  restaurants: RestaurantRow;
+  ordered_items: OrderedItemRow[];
+};
+
+/**
+ * A visit enriched with its restaurant and ordered items, as returned by
+ * `listVisits`.
+ */
+export type VisitWithContext = {
+  visit: Visit;
+  restaurant: Restaurant;
+  items: OrderedItem[];
+};
 
 /**
  * Paginated history of visits for a restaurant, newest first
@@ -38,6 +56,53 @@ export async function historyForRestaurant(
 
   const rows = (data as VisitWithItemsRow[]).map((row) => ({
     visit: mapVisit(row),
+    items: (row.ordered_items ?? []).map(mapOrderedItem),
+  }));
+
+  return {
+    rows,
+    nextOffset: rows.length === limit ? offset + limit : null,
+  };
+}
+
+/**
+ * Paginated list of ALL of the current user's visits across every restaurant,
+ * newest first (`visited_at desc`), each enriched with its restaurant and
+ * ordered items. RLS-scoped to the current user. Optional case-insensitive
+ * `search` filters by restaurant name. Throws on error.
+ */
+export async function listVisits(opts?: {
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<Page<VisitWithContext>> {
+  const limit = opts?.limit ?? DEFAULT_LIMIT;
+  const offset = opts?.offset ?? 0;
+
+  // `!inner` makes the restaurant join filterable (and required), so a
+  // `restaurants.name` filter restricts the parent visit rows.
+  const select = opts?.search
+    ? '*, restaurants!inner(*), ordered_items(*)'
+    : '*, restaurants(*), ordered_items(*)';
+
+  let query = supabase
+    .from('visits')
+    .select(select)
+    .order('visited_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (opts?.search) {
+    query = query.ilike('restaurants.name', `%${opts.search}%`);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    throw error;
+  }
+
+  const rows = (data as unknown as VisitWithContextRow[]).map((row) => ({
+    visit: mapVisit(row),
+    restaurant: mapRestaurant(row.restaurants),
     items: (row.ordered_items ?? []).map(mapOrderedItem),
   }));
 

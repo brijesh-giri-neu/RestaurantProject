@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../../features/auth';
 import { HomeScreen } from '../../features/home';
 import { AddVisitScreen } from '../../features/visits/screens/AddVisitScreen';
+import { BrowseVisitsScreen } from '../../features/visits/screens/BrowseVisitsScreen';
 import { LookupScreen } from '../../features/visits/screens/LookupScreen';
 import type { AppStackParamList } from './types';
 
@@ -44,6 +45,11 @@ export function AppStack(): React.JSX.Element {
         name="Lookup"
         component={LookupScreen}
         options={{ title: 'Lookup' }}
+      />
+      <Stack.Screen
+        name="BrowseVisits"
+        component={BrowseVisitsScreen}
+        options={{ title: 'Past Visits' }}
       />
     </Stack.Navigator>
   );

@@ -12,5 +12,9 @@ export {
 } from './types';
 
 export { listRestaurants } from './restaurants';
-export { historyForRestaurant } from './visits';
+export {
+  historyForRestaurant,
+  listVisits,
+  type VisitWithContext,
+} from './visits';
 export { addVisitWithItems, type AddVisitPayload } from './addVisitWithItems';
