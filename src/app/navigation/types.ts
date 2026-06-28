@@ -4,6 +4,9 @@ export type AuthStackParamList = {
 };
 
 export type AppStackParamList = {
+  Home: undefined;
   AddVisit: undefined;
   Lookup: undefined;
+  BrowseVisits: undefined;
+  EditVisit: { visitId: string };
 };

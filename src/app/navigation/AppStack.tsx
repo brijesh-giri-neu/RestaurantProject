@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../../features/auth';
+import { HomeScreen } from '../../features/home';
 import { AddVisitScreen } from '../../features/visits/screens/AddVisitScreen';
 import { LookupScreen } from '../../features/visits/screens/LookupScreen';
 import type { AppStackParamList } from './types';
@@ -25,9 +26,15 @@ function SignOutButton(): React.JSX.Element {
 export function AppStack(): React.JSX.Element {
   return (
     <Stack.Navigator
+      initialRouteName="Home"
       screenOptions={{
         headerRight: () => <SignOutButton />,
       }}>
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ title: 'Home' }}
+      />
       <Stack.Screen
         name="AddVisit"
         component={AddVisitScreen}
