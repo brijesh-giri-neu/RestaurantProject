@@ -45,6 +45,8 @@ type VisitFormProps = {
   saving: boolean;
   saveError: string | null;
   onSubmit: (values: VisitFormValues) => void | Promise<void>;
+  /** Optional content rendered below the submit button (e.g. a Delete action). */
+  footer?: React.ReactNode;
 };
 
 export function VisitForm({
@@ -55,6 +57,7 @@ export function VisitForm({
   saving,
   saveError,
   onSubmit,
+  footer,
 }: VisitFormProps): React.JSX.Element {
   const {
     control,
@@ -160,6 +163,8 @@ export function VisitForm({
             <Text style={styles.buttonText}>{submitLabel}</Text>
           )}
         </Pressable>
+
+        {footer}
       </ScrollView>
     </ScreenContainer>
   );

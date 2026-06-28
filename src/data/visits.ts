@@ -95,6 +95,17 @@ export async function getVisit(visitId: string): Promise<VisitWithContext> {
  * ordered items. RLS-scoped to the current user. Optional case-insensitive
  * `search` filters by restaurant name. Throws on error.
  */
+/**
+ * Deletes a visit by id. RLS restricts deletion to the owning user; the
+ * visit's `ordered_items` cascade-delete via their FK. Throws on error.
+ */
+export async function deleteVisit(visitId: string): Promise<void> {
+  const { error } = await supabase.from('visits').delete().eq('id', visitId);
+  if (error) {
+    throw error;
+  }
+}
+
 export async function listVisits(opts?: {
   limit?: number;
   offset?: number;

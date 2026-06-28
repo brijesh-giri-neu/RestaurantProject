@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../../shared/components/ScreenContainer';
 import type { AppStackParamList } from '../../../app/navigation/types';
 import type { VisitWithContext } from '../../../data/visits';
-import { getVisit } from '../../../data/visits';
+import { deleteVisit, getVisit } from '../../../data/visits';
 import { updateVisitWithItems } from '../../../data/updateVisitWithItems';
 import type { VisitFormValues } from '../validation/visitSchema';
 import { VisitForm } from '../components/VisitForm';
@@ -85,6 +85,7 @@ export function EditVisitScreen({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -121,6 +122,32 @@ export function EditVisitScreen({
     }
   };
 
+  const onDelete = useCallback((): void => {
+    Alert.alert('Delete visit', "Delete this visit? This can't be undone.", [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            setDeleting(true);
+            try {
+              await deleteVisit(visitId);
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation.navigate('BrowseVisits');
+              }
+            } catch (err) {
+              setDeleting(false);
+              Alert.alert('Could not delete visit', getErrorMessage(err));
+            }
+          })();
+        },
+      },
+    ]);
+  }, [navigation, visitId]);
+
   if (loading) {
     return (
       <ScreenContainer>
@@ -154,6 +181,21 @@ export function EditVisitScreen({
       saving={saving}
       saveError={saveError}
       onSubmit={onSubmit}
+      footer={
+        <Pressable
+          style={[styles.deleteButton, deleting && styles.deleteButtonDisabled]}
+          onPress={onDelete}
+          disabled={deleting}
+          accessibilityRole="button"
+          accessibilityLabel="Delete visit"
+        >
+          {deleting ? (
+            <ActivityIndicator color="#c0392b" />
+          ) : (
+            <Text style={styles.deleteButtonText}>Delete visit</Text>
+          )}
+        </Pressable>
+      }
     />
   );
 }
@@ -178,6 +220,21 @@ const styles = StyleSheet.create({
   link: {
     color: '#2d6cdf',
     fontSize: 15,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    borderWidth: 1,
+    borderColor: '#c0392b',
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  deleteButtonDisabled: {
+    opacity: 0.6,
+  },
+  deleteButtonText: {
+    color: '#c0392b',
+    fontSize: 16,
     fontWeight: '600',
   },
 });

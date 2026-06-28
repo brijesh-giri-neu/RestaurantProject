@@ -16,6 +16,7 @@ export {
   historyForRestaurant,
   listVisits,
   getVisit,
+  deleteVisit,
   type VisitWithContext,
 } from './visits';
 export { addVisitWithItems, type AddVisitPayload } from './addVisitWithItems';

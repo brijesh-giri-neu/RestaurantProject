@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -12,7 +13,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../../../app/navigation/types';
 import { ScreenContainer } from '../../../shared/components/ScreenContainer';
 import { useVisitsBrowse } from '../hooks/useVisitsBrowse';
-import type { VisitWithContext } from '../../../data';
+import { deleteVisit, type VisitWithContext } from '../../../data';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'BrowseVisits'>;
 
@@ -70,9 +71,11 @@ function ListFooterSpinner({
 function VisitRow({
   entry,
   onPress,
+  onDelete,
 }: {
   entry: VisitWithContext;
   onPress: () => void;
+  onDelete: () => void;
 }): React.JSX.Element {
   const total = formatTotal(entry.items);
   return (
@@ -89,6 +92,17 @@ function VisitRow({
         </Text>
         {total ? <Text style={styles.total}>{total}</Text> : null}
       </View>
+      <View style={styles.rowActions}>
+        <Pressable
+          onPress={onDelete}
+          hitSlop={8}
+          style={styles.deleteButton}
+          accessibilityRole="button"
+          accessibilityLabel="Delete visit"
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </Pressable>
+      </View>
     </Pressable>
   );
 }
@@ -104,6 +118,38 @@ export function BrowseVisitsScreen({ navigation }: Props): React.JSX.Element {
     }, [refresh]),
   );
 
+  const confirmDelete = useCallback(
+    (entry: VisitWithContext) => {
+      Alert.alert(
+        'Delete visit',
+        "Delete this visit? This can't be undone.",
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              void (async () => {
+                try {
+                  await deleteVisit(entry.visit.id);
+                  await refresh();
+                } catch (err) {
+                  Alert.alert(
+                    'Could not delete visit',
+                    err instanceof Error
+                      ? err.message
+                      : 'Something went wrong. Please try again.',
+                  );
+                }
+              })();
+            },
+          },
+        ],
+      );
+    },
+    [refresh],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: VisitWithContext }) => (
       <VisitRow
@@ -111,9 +157,10 @@ export function BrowseVisitsScreen({ navigation }: Props): React.JSX.Element {
         onPress={() =>
           navigation.navigate('EditVisit', { visitId: item.visit.id })
         }
+        onDelete={() => confirmDelete(item)}
       />
     ),
-    [navigation],
+    [navigation, confirmDelete],
   );
 
   if (loading) {
@@ -222,5 +269,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#222',
     marginLeft: 8,
+  },
+  rowActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  deleteButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#fdecea',
+  },
+  deleteButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#c0392b',
   },
 });
