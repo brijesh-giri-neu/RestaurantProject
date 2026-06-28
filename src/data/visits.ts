@@ -66,6 +66,30 @@ export async function historyForRestaurant(
 }
 
 /**
+ * Loads a single visit (RLS-scoped to the current user) enriched with its
+ * restaurant and ordered items, for editing. Throws on error or if no visit
+ * with the given id is visible to the current user.
+ */
+export async function getVisit(visitId: string): Promise<VisitWithContext> {
+  const { data, error } = await supabase
+    .from('visits')
+    .select('*, restaurants(*), ordered_items(*)')
+    .eq('id', visitId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  const row = data as unknown as VisitWithContextRow;
+  return {
+    visit: mapVisit(row),
+    restaurant: mapRestaurant(row.restaurants),
+    items: (row.ordered_items ?? []).map(mapOrderedItem),
+  };
+}
+
+/**
  * Paginated list of ALL of the current user's visits across every restaurant,
  * newest first (`visited_at desc`), each enriched with its restaurant and
  * ordered items. RLS-scoped to the current user. Optional case-insensitive

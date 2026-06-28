@@ -5,6 +5,7 @@ import { useAuth } from '../../features/auth';
 import { HomeScreen } from '../../features/home';
 import { AddVisitScreen } from '../../features/visits/screens/AddVisitScreen';
 import { BrowseVisitsScreen } from '../../features/visits/screens/BrowseVisitsScreen';
+import { EditVisitScreen } from '../../features/visits/screens/EditVisitScreen';
 import { LookupScreen } from '../../features/visits/screens/LookupScreen';
 import type { AppStackParamList } from './types';
 
@@ -50,6 +51,11 @@ export function AppStack(): React.JSX.Element {
         name="BrowseVisits"
         component={BrowseVisitsScreen}
         options={{ title: 'Past Visits' }}
+      />
+      <Stack.Screen
+        name="EditVisit"
+        component={EditVisitScreen}
+        options={{ title: 'Edit Visit' }}
       />
     </Stack.Navigator>
   );
