@@ -4,7 +4,7 @@
 future work (nice-to-haves) not yet implemented. **Keep this file updated** whenever work starts/lands
 or scope changes.
 
-Last updated: 2026-06-27 · Stack: React Native + Supabase + OSM · Scope: mobile-only
+Last updated: 2026-06-27 (UI layout overhaul) · Stack: React Native + Supabase + OSM · Scope: mobile-only
 Status: **all v1 tasks (01–10) implemented** — pending live setup (apply migrations, fill `.env`, `pod install`) before running on device.
 
 Status legend: `⬜ Not started` · `🟨 Scaffolded/partial` · `🟦 In progress` · `✅ Done`
@@ -87,6 +87,17 @@ Discussed enhancements beyond the first requirement. Depend on v1 (all done).
 | Task | Status | Notes |
 | ---- | ------ | ----- |
 | [task-15 — Search restaurants & dishes](./tasks/task-15-search-restaurants-and-dishes.md) | ✅ Done | `data.searchDishes` + Dishes section in Lookup; tap → edit. (pg_trgm index deferred.) |
+
+### Feature 11 — UI layout overhaul
+Cross-screen layout/structure fixes (no feature/behavior changes). Introduces a shared layout foundation so spacing, radii, and palette stop drifting per-file.
+
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| Shared layout foundation | ✅ Done | `src/shared/theme` tokens (spacing scale, radii, typography, centralized existing palette) + primitives `FormScreen`, `Field`, `Card`, `Row`; `ScreenContainer` gains `padded`. |
+| Keyboard-safe forms | ✅ Done | Auth + visit form wrapped in `FormScreen` (KeyboardAvoidingView + ScrollView) so the submit button/notes/Delete no longer hide behind the keyboard. |
+| Lookup single-scroll | ✅ Done | Removed the 50/50 `flex:1` split; Restaurants FlatList keeps pagination, Dishes render as `ListFooterComponent` (no nested VirtualizedList). |
+| Card hierarchy & item rows | ✅ Done | Browse rows rebuilt as `Card` + `Row` with a lighter Delete; `OrderedItemRow` puts Price + Rating side-by-side in a compact card. |
+| Home & nav chrome | ✅ Done | Home gets a primary action + secondary cards; nav header + Sign-out tokenized. |
 
 ---
 
