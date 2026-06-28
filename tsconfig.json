@@ -1,7 +1,35 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    "types": ["jest"]
+    // This is a shared, cross-platform src tree. The React Native base config
+    // (@react-native/typescript-config) ships a DOM-less `lib`, which is correct
+    // for native, but the web build (*.web.ts shims + web/env-shim.ts) needs DOM
+    // globals (navigator, GeolocationPosition, etc.) and import.meta.env.
+    //
+    // TypeScript REPLACES `lib` wholesale when overridden (it does not merge),
+    // so the full base list must be restated here before appending "dom" and
+    // "dom.iterable" — dropping any entry would silently shrink native typings.
+    //
+    // `types`: "jest" for tests, "vite/client" supplies the ImportMeta.env typing
+    // used by web/env-shim.ts (node_modules/vite/client.d.ts).
+    "lib": [
+      "es2019",
+      "es2020.bigint",
+      "es2020.date",
+      "es2020.number",
+      "es2020.promise",
+      "es2020.string",
+      "es2020.symbol.wellknown",
+      "es2021.promise",
+      "es2021.string",
+      "es2021.weakref",
+      "es2022.array",
+      "es2022.object",
+      "es2022.string",
+      "dom",
+      "dom.iterable"
+    ],
+    "types": ["jest", "vite/client"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["**/node_modules", "**/Pods"]
