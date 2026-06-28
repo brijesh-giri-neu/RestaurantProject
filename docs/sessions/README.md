@@ -19,3 +19,4 @@ One file per session: `session-YYYY-MM-DD[-slug].md` containing:
 | Date | File | Summary |
 | ---- | ---- | ------- |
 | 2026-06-27 | [session-2026-06-27-init-and-plan.md](./session-2026-06-27-init-and-plan.md) | Initialized RN repo, set up docs, planned first core requirement |
+| 2026-06-28 | [session-2026-06-28-web-support.md](./session-2026-06-28-web-support.md) | Audited + fixed the uncommitted web target (react-native-web + Vite); fixed TS config, verified rendering, updated docs |

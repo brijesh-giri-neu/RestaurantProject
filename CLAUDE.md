@@ -17,7 +17,7 @@ the cloud (Supabase) and scoped per authenticated user.
 - **Look up** a user's past ordered items at any restaurant they've visited.
 - Keep the codebase **modular and swappable** (external integrations behind interfaces).
 
-Scope today: **mobile only** (iOS + Android). Web/desktop are out of scope.
+Scope today: **mobile** (iOS + Android) plus a **web** target (react-native-web + Vite) that runs the same app in the browser. Desktop remains out of scope.
 
 ---
 
@@ -34,13 +34,15 @@ Scope today: **mobile only** (iOS + Android). Web/desktop are out of scope.
 ### Tech stack
 React Native 0.86 · TypeScript · Supabase (Postgres + Auth + RLS) · React Navigation (native-stack) ·
 react-hook-form + zod · react-native-geolocation-service · OpenStreetMap (Overpass + Nominatim) ·
-react-native-dotenv.
+react-native-dotenv · react-native-web + Vite (web target).
 
 ### Common commands
 ```sh
 npm start          # Metro bundler
 npm run ios        # build & run iOS
 npm run android    # build & run Android
+npm run web        # Vite dev server (react-native-web)
+npm run web:build  # production web build (Vite)
 npm test           # Jest
 npm run lint       # ESLint
 ```

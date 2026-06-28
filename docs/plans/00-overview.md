@@ -13,7 +13,7 @@ A form-driven flow, **per authenticated user**, to log a restaurant visit:
 - Persist everything to the **cloud (Supabase / Postgres)**, scoped to the logged-in user.
 - A **Lookup** screen to view that user's past ordered items at a given restaurant.
 
-Scope now: **mobile only** (iOS + Android). Web/desktop deferred.
+Scope now: **mobile** (iOS + Android) plus a **web** target (react-native-web + Vite) running the same app in the browser. Desktop deferred.
 
 ## Key decisions
 
