@@ -7,6 +7,7 @@ import { AddVisitScreen } from '../../features/visits/screens/AddVisitScreen';
 import { BrowseVisitsScreen } from '../../features/visits/screens/BrowseVisitsScreen';
 import { EditVisitScreen } from '../../features/visits/screens/EditVisitScreen';
 import { LookupScreen } from '../../features/visits/screens/LookupScreen';
+import { colors, hitSlop, typography } from '../../shared/theme';
 import type { AppStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -19,7 +20,7 @@ function SignOutButton(): React.JSX.Element {
       onPress={() => {
         void signOut();
       }}
-      hitSlop={8}>
+      hitSlop={hitSlop}>
       <Text style={styles.signOut}>Sign out</Text>
     </Pressable>
   );
@@ -30,6 +31,8 @@ export function AppStack(): React.JSX.Element {
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
+        headerTintColor: colors.primary,
+        headerTitleStyle: { color: colors.text },
         headerRight: () => <SignOutButton />,
       }}>
       <Stack.Screen
@@ -63,8 +66,7 @@ export function AppStack(): React.JSX.Element {
 
 const styles = StyleSheet.create({
   signOut: {
-    color: '#2d6cdf',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.sectionTitle,
+    color: colors.primary,
   },
 });
