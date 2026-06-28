@@ -15,6 +15,12 @@ export { listRestaurants } from './restaurants';
 export {
   historyForRestaurant,
   listVisits,
+  getVisit,
   type VisitWithContext,
 } from './visits';
 export { addVisitWithItems, type AddVisitPayload } from './addVisitWithItems';
+export {
+  updateVisitWithItems,
+  type UpdateVisitPayload,
+} from './updateVisitWithItems';
+export { searchDishes, type DishHit } from './search';
