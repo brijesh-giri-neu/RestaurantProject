@@ -60,6 +60,9 @@ yarn-error.log
 # Bundle artifact
 *.jsbundle
 
+# Web build output (vite build)
+dist/
+
 # Ruby / CocoaPods
 **/Pods/
 /vendor/bundle/

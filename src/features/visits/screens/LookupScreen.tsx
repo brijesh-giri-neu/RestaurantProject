@@ -343,7 +343,12 @@ export function LookupScreen({ navigation }: Props): React.JSX.Element {
           }}
           refreshing={restaurantsRefreshing}
           contentContainerStyle={
-            restaurants.length === 0 ? styles.emptyContent : styles.listContent
+            // Only center when there's genuinely nothing to show. While searching,
+            // the dishes footer must lay out top-aligned and full-width, otherwise
+            // the centered container collapses DishRow's flex:1 name column to zero.
+            restaurants.length === 0 && !isSearching
+              ? styles.emptyContent
+              : styles.listContent
           }
           ListEmptyComponent={
             <Text style={styles.emptyText}>
@@ -410,6 +415,7 @@ const styles = StyleSheet.create({
   },
   dishesSection: {
     marginTop: spacing.lg,
+    alignSelf: 'stretch',
   },
   sectionLoading: {
     alignItems: 'center',

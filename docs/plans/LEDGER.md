@@ -4,7 +4,7 @@
 future work (nice-to-haves) not yet implemented. **Keep this file updated** whenever work starts/lands
 or scope changes.
 
-Last updated: 2026-06-27 (UI layout overhaul) · Stack: React Native + Supabase + OSM · Scope: mobile-only
+Last updated: 2026-06-28 (web target) · Stack: React Native + Supabase + OSM · Scope: mobile (iOS + Android) + web (react-native-web + Vite); desktop still out of scope
 Status: **all v1 tasks (01–10) implemented** — pending live setup (apply migrations, fill `.env`, `pod install`) before running on device.
 
 Status legend: `⬜ Not started` · `🟨 Scaffolded/partial` · `🟦 In progress` · `✅ Done`
@@ -99,6 +99,18 @@ Cross-screen layout/structure fixes (no feature/behavior changes). Introduces a 
 | Card hierarchy & item rows | ✅ Done | Browse rows rebuilt as `Card` + `Row` with a lighter Delete; `OrderedItemRow` puts Price + Rating side-by-side in a compact card. |
 | Home & nav chrome | ✅ Done | Home gets a primary action + secondary cards; nav header + Sign-out tokenized. |
 
+### Feature 12 — Web target (react-native-web + Vite)
+Runs the same app (`src/app/App.tsx`) in the browser via react-native-web, bundled by Vite. Mobile (Metro) is unchanged; web is an additive build alongside iOS/Android.
+
+| Task | Status | Notes |
+| ---- | ------ | ----- |
+| Vite + RN-web build config | ✅ Done | `vite.config.mjs`: `@vitejs/plugin-react`; `.web.*` extension priority (mirrors Metro); alias `react-native`→`react-native-web`; `define` for `global`/`__DEV__`; `optimizeDeps` JSX loader for RN-web `.js`. Scripts `npm run web` (dev) / `npm run web:build`; deps `react-dom`, `react-native-web`, `vite`, `@vitejs/plugin-react`, `vite-plugin-commonjs`. |
+| Web entry (index.html / index.web.js) | ✅ Done | `index.html` + `index.web.js` mount the **same** `src/app/App.tsx` via `AppRegistry` into `#root` — no app-code fork. |
+| Location web shims | ✅ Done | `src/services/location/permissions.web.ts` + `locationService.web.ts` use browser `navigator.geolocation`; native `react-native-geolocation-service` / `PermissionsAndroid` files are excluded from the web bundle by `.web.ts` resolution. |
+| `@env` / url-polyfill web shims | ✅ Done | `web/env-shim.ts` bridges `@env` to Vite `import.meta.env` (via `envPrefix` `SUPABASE_`/`OSM_`); `web/empty.ts` no-ops `react-native-url-polyfill/auto` (browser provides URL). |
+| AsyncStorage web session persistence | ✅ Done | `@react-native-async-storage/async-storage` resolves to its web (IndexedDB/localStorage) backend, so Supabase session persistence works on web. |
+| TypeScript config DOM-aware for web | ✅ Done | `tsconfig.json` includes DOM lib + `vite/client` types so `tsc` is clean over the web files (`import.meta.env`, `document`, `navigator`). |
+
 ---
 
 ## Cross-cutting requirements (folded into the tasks above)
@@ -134,7 +146,7 @@ Optional work we discussed but did not commit to — may never be built.
 | ---- | ------------ |
 | **Offline support / sync** | Nice-to-have UX (log with no signal); hard, not default in RN/Supabase. Deferred indefinitely. |
 | **Social login (Google/Apple)** | Email/password chosen for v1; social sign-in is optional polish. |
-| **Web + desktop targets** (RN Web/Expo, Electron/Tauri) | Scope is mobile-only; expanding platforms is optional/future. |
+| **Desktop target** (Electron/Tauri) | Web is now implemented (see Feature 12); a packaged desktop shell remains optional/future. |
 
 ---
 
